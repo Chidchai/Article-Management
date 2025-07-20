@@ -2,7 +2,10 @@
   <section class="max-w-3xl mx-auto py-16 px-4 space-y-6">
     <div class="space-y-2">
       <h1 class="text-3xl font-bold">{{ article?.title }}</h1>
-      <p class="text-sm text-muted-foreground">{{ formatDate(article?.published_at) }} · อ่าน {{ readingTime(article?.content) }} นาที</p>
+      <p class="text-sm text-muted-foreground">
+        {{ formatDate(article?.published_at) }} ·
+        <!-- อ่าน {{ readingTime(article?.content) }} นาที</p> -->
+      </p>
     </div>
 
     <div v-html="article?.content" class="prose max-w-none" />
@@ -19,7 +22,6 @@
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useArticles } from "@/composables/useArticles";
-import { readingTime } from "@/utils/readingTime";
 
 const route = useRoute();
 const { getArticleBySlug } = useArticles();
