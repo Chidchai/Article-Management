@@ -1,75 +1,38 @@
-# Nuxt Minimal Starter
+# 📰 Article Management System (Nuxt 3 + Supabase)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+ระบบจัดการบทความด้านการเงิน/สินเชื่อ
 
-## Setup
+---
 
-Make sure to install dependencies:
+## Features
+
+- Admin Auth (Login/Register) ผ่าน Supabase
+- สร้าง/แก้ไขบทความ พร้อม Rich Text Editor (Tiptap)
+
+---
+
+## Architecture Decisions
+
+| Component    | Technology               | Notes                            |
+| ------------ | ------------------------ | -------------------------------- |
+| Frontend     | Nuxt 3, ShadCN-Vue       | SSR support, Tailwind UI         |
+| Auth         | Supabase Auth            | Admin-only access                |
+| DB + Storage | Supabase (Postgres + S3) | Store article metadata & media   |
+| Editor       | Tiptap (RichTextEditor)  | Extensible content block editing |
+
+## Demo Credentials
+
+Email: demo@article.com  
+Password: demo1234
 
 ```bash
-# npm
-npm install
+# 1. Clone repo
+git clone https://github.com/Chidchai/Article-Management
+cd loan-calculator
 
-# pnpm
+# 2. Install dependencies
 pnpm install
 
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
+# 3. Run dev
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
