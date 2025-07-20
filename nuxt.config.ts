@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     port: 8080,
   },
 
-  modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxt/fonts', '@nuxt/icon', '@nuxt/ui', '@nuxt/test-utils', 'shadcn-nuxt', '@vite-pwa/nuxt', '@nuxtjs/supabase', '@nuxtjs/color-mode'],
+  modules: ['@pinia/nuxt', '@nuxt/fonts', '@nuxt/icon', '@nuxt/ui', '@nuxt/test-utils', 'shadcn-nuxt', '@vite-pwa/nuxt', '@nuxtjs/supabase', '@nuxtjs/color-mode'],
   css: ['~/assets/css/tailwind.css'],
   vite: {
     plugins: [tailwindcss()],
