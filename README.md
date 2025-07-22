@@ -13,15 +13,14 @@
 
 ## Architecture Decisions
 
-| Component    | Technology               | Notes                            |
-| ------------ | ------------------------ | -------------------------------- |
-| Frontend     | Nuxt 3, ShadCN-Vue       | SSR support, Tailwind UI         |
-| Auth         | Supabase Auth            | Admin-only access                |
-| DB + Storage | Supabase (Postgres + S3) | Store article metadata & media   |
-| Editor       | Tiptap (RichTextEditor)  | Extensible content block editing |
+| Component | Technology         | Notes                    |
+| --------- | ------------------ | ------------------------ |
+| Frontend  | Nuxt 3, ShadCN-Vue | SSR support, Tailwind UI |
+| Auth      | Supabase Auth      | Admin-only access        |
 
 ## Demo Credentials
 
+https://article-management-psi.vercel.app/admin/login
 Email: demo@article.com  
 Password: demo1234
 
