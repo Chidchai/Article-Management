@@ -1,21 +1,26 @@
 <template>
   <section class="max-w-4xl mx-auto py-10 px-4">
     <h1 class="text-2xl font-bold mb-6">แก้ไขบทความ</h1>
-    <ArticleForm :initial-data="article" />
+    <ArticleForm v-if="article" :initial-data="article" />
   </section>
 </template>
 
 <script setup lang="ts">
-import ArticleForm from "@/components/Admin/ArticleForm.vue";
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
+import ArticleForm from "@/components/Admin/ArticleForm.vue";
+import type { articleForm } from "~/types/article";
 
 const route = useRoute();
-const article = ref(null);
+const article = ref<articleForm | null>(null);
 
 onMounted(async () => {
-  // const id = route.params.id;
-  // const res = await $fetch(`/api/articles/${id}`);
-  //article.value = res;
+  try {
+    const { data, error } = await useFetch<articleForm>(`/api/articles/${route.params.id}`);
+    if (error.value) throw new Error(error.value.message);
+    article.value = data.value;
+  } catch (err) {
+    console.error("โหลดบทความล้มเหลว:", err);
+  }
 });
 </script>

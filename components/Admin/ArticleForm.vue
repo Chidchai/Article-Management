@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-4 flex justify-end">
+  <div class="pt-4 pb-4 flex justify-end">
     <Button variant="secondary" @click="router.back()">ย้อนกลับ</Button>
   </div>
   <form class="grid grid-cols-1 lg:grid-cols-3 gap-6" @submit.prevent="onSubmit">
@@ -13,6 +13,7 @@
         <Label for="content">เนื้อหา</Label>
         <RichTextEditor id="content" v-model="form.content" />
       </div>
+
       <div class="rounded-md border p-4 space-y-3">
         <Label>Focus Keyphrase</Label>
         <Input v-model="form.focusKeyphrase" placeholder="Focus keyphrase" />
@@ -24,9 +25,6 @@
     </div>
 
     <div class="space-y-6">
-      <div class="space-y-2">
-        <Label for="title"></Label>
-      </div>
       <div class="rounded-md border p-4 space-y-3">
         <Label>เผยแพร่</Label>
         <Select v-model="form.status">
@@ -70,9 +68,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { debounce } from "lodash-es";
+import { debounce } from "lodash";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -80,37 +78,36 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { TagsInput, TagsInputItem, TagsInputItemText, TagsInputItemDelete, TagsInputInput } from "@/components/ui/tags-input";
-
 import RichTextEditor from "@/components/Article/RichTextEditor.vue";
+import type { articleForm } from "~/types/article";
+
+const props = defineProps<{ initialData?: articleForm }>();
 
 const router = useRouter();
+const form = useArticleFormStore();
 
-const form = ref({
-  title: "",
-  content: "",
-  categories: [],
-  tags: [],
-  coverImage: "",
-  status: "draft",
-  metaTitle: "",
-  metaDescription: "",
-  focusKeyphrase: "",
+// โหลด draft ที่เคยบันทึกไว้
+onMounted(() => {
+  if (props?.initialData) {
+    Object.assign(form, props.initialData);
+  } else {
+    form.clearForm();
+  }
 });
 
-const saveDraft = debounce(() => {
-  localStorage.setItem("article-draft", JSON.stringify(form.value));
+// Auto save ทุก 2 วิหลังหยุดพิมพ์
+const autoSave = debounce(() => {
+  //form.saveDraftToServer();
 }, 2000);
 
-watch(form, () => saveDraft(), { deep: true });
+watch(() => form.$state, autoSave, { deep: true });
 
-onMounted(() => {
-  const saved = localStorage.getItem("article-draft");
-  if (saved) form.value = JSON.parse(saved);
-});
+const saveDraft = async () => {
+  await form.saveDraftToServer();
+};
 
 const onSubmit = async () => {
-  console.log("Form data:", form.value);
-  localStorage.removeItem("article-draft");
-  router.push("/admin/dashboard");
+  const success = await form.submit();
+  if (success) router.push("/admin/dashboard");
 };
 </script>

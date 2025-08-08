@@ -20,13 +20,9 @@
 </template>
 
 <script setup lang="ts">
+import type { articles } from "~/types/article";
+
 defineProps<{
-  article: {
-    id: number;
-    slug: string;
-    title: string;
-    excerpt: string;
-    cover?: string;
-  };
+  article: articles;
 }>();
 </script>

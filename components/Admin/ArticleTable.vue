@@ -1,34 +1,30 @@
 <script setup lang="ts">
-import type { ColumnDef } from "@tanstack/vue-table";
+import type { ColumnDef, ColumnFiltersState } from "@tanstack/vue-table";
 import { getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useVueTable, FlexRender } from "@tanstack/vue-table";
 import { h, ref } from "vue";
 import { ArrowUpDown } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 interface Article {
   id: string;
   title: string;
-  status: "draft" | "published";
-  email: string;
+  status: "draft" | "published" | "delete";
+  createByName: string;
+  createBy: string;
 }
 
-const data: Article[] = [
-  { id: "1", title: "บทความแรก", status: "published", email: "admin@example.com" },
-  { id: "2", title: "ยังไม่มีชื่อ", status: "draft", email: "writer@example.com" },
-  { id: "3", title: "เทคนิคการเขียน SEO", status: "published", email: "seo@example.com" },
-];
+const router = useRouter();
+const articles = ref<Article[]>([]);
+const { data, error } = await useFetch<Article[]>("/api/articles");
+
+if (data.value) {
+  articles.value = data.value;
+} else {
+  console.error("❌ โหลดบทความล้มเหลว:", error.value?.message);
+}
 
 const columns: ColumnDef<Article>[] = [
   {
@@ -43,24 +39,29 @@ const columns: ColumnDef<Article>[] = [
     cell: ({ row }) => h("span", row.getValue("status")),
   },
   {
-    accessorKey: "email",
-    header: ({ column }) =>
-      h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Email", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      ),
-    cell: ({ row }) => h("span", row.getValue("email")),
+    accessorKey: "createByName",
+    header: "ผู้สร้าง",
+    cell: ({ row }) => h("span", row.getValue("createByName")),
   },
+  // {
+  //   accessorKey: "email",
+  //   header: ({ column }) =>
+  //     h(
+  //       Button,
+  //       {
+  //         variant: "ghost",
+  //         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+  //       },
+  //       () => ["Email", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+  //     ),
+  //   cell: ({ row }) => h("span", row.getValue("email")),
+  // },
   {
     id: "actions",
     header: "จัดการ",
     cell: ({ row }) =>
       h("div", { class: "flex gap-2" }, [
-        h(Button, { size: "sm", variant: "outline" }, "แก้ไข"),
+        h(Button, { size: "sm", variant: "outline", onClick: () => router.push(`/admin/articles/${row.original.id}`) }, "แก้ไข"),
         h(
           Button,
           {
@@ -74,10 +75,10 @@ const columns: ColumnDef<Article>[] = [
   },
 ];
 
-const columnFilters = ref([]);
+const columnFilters = ref<ColumnFiltersState>([]);
 
 const table = useVueTable({
-  data,
+  data: articles,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -94,29 +95,31 @@ const table = useVueTable({
 });
 
 const isDeleteConfirmOpen = ref(false);
-const itemToDelete = ref<number>(0);
+const itemToDelete = ref<Article | null>(null);
 
-function confirmDelete(item: number) {
+function confirmDelete(item: Article) {
   itemToDelete.value = item;
   isDeleteConfirmOpen.value = true;
 }
 
-function deleteItem() {
-  if (itemToDelete.value) {
-    console.log("ลบ:", itemToDelete.value);
-    isDeleteConfirmOpen.value = false;
-    itemToDelete.value = null;
+async function deleteItem() {
+  if (!itemToDelete.value) return;
+
+  const { error } = await useFetch(`/api/articles/${itemToDelete.value.id}`, {
+    method: "DELETE",
+  });
+
+  if (error.value) {
+    console.error("❌ ลบล้มเหลว:", error.value.message);
   }
+
+  isDeleteConfirmOpen.value = false;
+  itemToDelete.value = null;
 }
 </script>
 <template>
   <div class="space-y-4">
-    <Input
-      class="max-w-sm"
-      placeholder="ค้นหาหัวข้อ..."
-      :model-value="table.getColumn('title')?.getFilterValue() as string"
-      @update:model-value="table.getColumn('title')?.setFilterValue($event)"
-    />
+    <Input class="max-w-sm" placeholder="ค้นหาหัวข้อ..." :model-value="table.getColumn('title')?.getFilterValue() as string" @update:model-value="table.getColumn('title')?.setFilterValue($event)" />
 
     <div class="rounded-md border">
       <Table>

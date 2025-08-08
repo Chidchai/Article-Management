@@ -6,7 +6,7 @@
     </div>
 
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
+      <ArticleCard v-for="article in articlesList" :key="article.id" :article="article" />
     </div>
   </section>
 </template>
@@ -15,11 +15,12 @@
 import { onMounted, ref } from "vue";
 import { useArticles } from "@/composables/useArticles";
 import ArticleCard from "@/components/Article/ArticleCard.vue";
+import type { Article } from "~/types/article";
 
-const articles = ref([]);
+const articlesList = ref<Article[]>([]);
 const { fetchArticles } = useArticles();
 
 onMounted(async () => {
-  //articles.value = await fetchArticles();
+  articlesList.value = await fetchArticles();
 });
 </script>
